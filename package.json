@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "git 'init' on steriods",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "ginit": "./index.js"
   },
   "keywords": [
     "GIT",

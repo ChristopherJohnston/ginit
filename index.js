@@ -1,48 +1,44 @@
-const chalk = require("chalk");
-const clear = require("clear");
-const figlet = require("figlet");
-const files = require('./lib/files');
-// const inquirer = require('./lib/inquirer');
-const github = require('./lib/github');
-const repo = require('./lib/repo');
+#!/usr/bin/env node --experimental-modules
+
+import chalk from 'chalk';
+import clear from 'clear';
+import figlet from 'figlet';
+import { directoryExists } from './lib/files.js';
+import { getStoredGitGubToken, setGithubCredentials, registerNewToken, githubAuth } from './lib/github.js';
+import { createGitIgnore, createRemoteRepo, setupRepo} from './lib/repo.js';
 
 clear();
 
 console.log(
     chalk.yellow(
-        figlet.textSync('Ginit', { horizontalLayout: 'full'})
+        figlet.textSync('cmdCoRE', { horizontalLayout: 'full'})
     )
 );
 
-if (files.directoryExists('.git')) {
+if (directoryExists('.git')) {
     console.log(chalk.red('Already a Git repository!'));
     process.exit();
 }
 
-// const run = async () => {
-//     const credentials = await inquirer.askGithubCredentials();
-//     console.log(credentials);
-// };
-
-const getGithubToken = async () => {
-    let token = github.getStoredGitGubToken();
+async function getGithubToken() {
+    let token = getStoredGitGubToken();
     if (token) {
         return token;
     }
 
-    await github.setGithubCredentials();
-    token = await github.registerNewToken();
+    await setGithubCredentials();
+    token = await registerNewToken();
     return token;
 };
 
-const run = async() =>  {
+async function run() {
     try {
         const token = await getGithubToken();
-        github.githubAuth(token);
+        githubAuth(token);
 
-        const url = await repo.createRemoteRepo();
-        await repo.createGitIgnore();
-        await repo.setupRepo(url);
+        const url = await createRemoteRepo();
+        await createGitIgnore();
+        await setupRepo(url);
         console.log(chalk.green('All done!'));
     } catch (err) {
         if (err) {
